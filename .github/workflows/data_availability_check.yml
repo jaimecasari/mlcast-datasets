@@ -26,8 +26,6 @@ jobs:
     - name: Install the latest version of uv
       uses: astral-sh/setup-uv@v5
     - name: Test with pytest
-      env:
-        RICH_FORCE_TERMINAL: "1" # Force Rich to render tables in CI where TTY is not available (xdist worker output is non-interactive).
       run: |
         # install package with dependencies and editable version of our package
         # so that it is available in the venv

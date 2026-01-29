@@ -1,5 +1,6 @@
 import importlib
 import io
+import sys
 from contextlib import redirect_stdout
 
 import pytest
@@ -80,10 +81,10 @@ def test_dataset_passes_validator(catalog, dataset_name):
     validate_dataset = _load_validator(spec)
     report = validate_dataset(dataset_path, storage_options=storage_options)
     buffer = io.StringIO()
-    # Rich writes tables to stdout; capture and replay to ensure CI logs include the report.
+    # Rich writes tables to stdout; capture and replay to stderr so CI logs include the report.
     with redirect_stdout(buffer):
         report.console_print()
-    print(buffer.getvalue())
+    print(buffer.getvalue(), file=sys.stderr)
 
     if report.has_fails():
         pytest.fail(report.summarize())
