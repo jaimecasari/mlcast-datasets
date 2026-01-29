@@ -1,10 +1,9 @@
 import importlib
-from contextlib import contextmanager
+import io
+from contextlib import redirect_stdout
 
-import mlcast_dataset_validator.specs.base as validator_base
 import pytest
 from loguru import logger
-from rich.console import Console as RichConsole
 
 import mlcast_datasets
 
@@ -58,21 +57,6 @@ def _load_validator(spec):
     return module.validate_dataset
 
 
-@contextmanager
-def _force_rich_terminal():
-    original_console = validator_base.Console
-
-    def _console_factory(*args, **kwargs):
-        kwargs.setdefault("force_terminal", True)
-        return RichConsole(*args, **kwargs)
-
-    validator_base.Console = _console_factory
-    try:
-        yield
-    finally:
-        validator_base.Console = original_console
-
-
 @pytest.mark.parametrize("dataset_name", all_entries())
 def test_dataset_passes_validator(catalog, dataset_name):
     item = catalog[dataset_name]
@@ -95,9 +79,12 @@ def test_dataset_passes_validator(catalog, dataset_name):
     storage_options = args.get("storage_options")
     validate_dataset = _load_validator(spec)
     report = validate_dataset(dataset_path, storage_options=storage_options)
-    with _force_rich_terminal():
+    buffer = io.StringIO()
+    # Rich writes tables to stdout; capture and replay to ensure CI logs include the report.
+    with redirect_stdout(buffer):
         report.console_print()
-    print(report.summarize())
+    print(buffer.getvalue())
+
     if report.has_fails():
         pytest.fail(report.summarize())
 
