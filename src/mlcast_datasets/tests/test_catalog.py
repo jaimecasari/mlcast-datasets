@@ -1,7 +1,13 @@
+import importlib
+
 import pytest
 from loguru import logger
 
 import mlcast_datasets
+
+VALIDATOR_SPECS = {
+    "precipitation": ("source_data", "radar_precipitation"),
+}
 
 
 @pytest.fixture
@@ -32,6 +38,48 @@ def test_get_intake_source(catalog, dataset_name):
             pass
         else:
             raise Exception(plugin)
+
+
+def _infer_validator_spec(dataset_name: str):
+    parts = dataset_name.replace("/", ".").split(".")
+    if not parts:
+        return None
+    return VALIDATOR_SPECS.get(parts[0])
+
+
+def _load_validator(spec):
+    data_stage, product = spec
+    module = importlib.import_module(
+        f"mlcast_dataset_validator.specs.{data_stage}.{product}"
+    )
+    return module.validate_dataset
+
+
+@pytest.mark.parametrize("dataset_name", all_entries())
+def test_dataset_passes_validator(catalog, dataset_name):
+    item = catalog[dataset_name]
+    if item.container == "catalog":
+        pytest.skip("Catalog entry; validator applies to datasets only.")
+
+    spec = _infer_validator_spec(dataset_name)
+    if spec is None:
+        pytest.fail(f"No validator spec mapping for dataset '{dataset_name}'.")
+
+    if hasattr(item, "describe"):
+        description = item.describe()
+    else:
+        description = item._entry.describe()
+    args = description.get("args", {})
+    dataset_path = args.get("urlpath") or args.get("path")
+    if not dataset_path:
+        pytest.fail(f"No dataset path found for '{dataset_name}'.")
+
+    storage_options = args.get("storage_options")
+    validate_dataset = _load_validator(spec)
+    report = validate_dataset(dataset_path, storage_options=storage_options)
+    report.console_print()
+    if report.has_fails():
+        pytest.fail(report.summarize())
 
 
 @pytest.mark.modified_on_branch
