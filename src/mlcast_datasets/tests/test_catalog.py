@@ -78,6 +78,7 @@ def test_dataset_passes_validator(catalog, dataset_name):
     validate_dataset = _load_validator(spec)
     report = validate_dataset(dataset_path, storage_options=storage_options)
     report.console_print()
+    print(report.summarize())
     if report.has_fails():
         pytest.fail(report.summarize())
 
