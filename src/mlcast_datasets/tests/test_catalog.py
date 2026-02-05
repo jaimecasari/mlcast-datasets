@@ -68,18 +68,11 @@ def test_dataset_passes_validator(catalog, dataset_name):
     if spec is None:
         pytest.fail(f"No validator spec mapping for dataset '{dataset_name}'.")
 
-    if hasattr(item, "describe"):
-        description = item.describe()
-    else:
-        description = item._entry.describe()
-    args = description.get("args", {})
-    dataset_path = args.get("urlpath") or args.get("path")
-    if not dataset_path:
-        pytest.fail(f"No dataset path found for '{dataset_name}'.")
-
-    storage_options = args.get("storage_options")
     validate_dataset = _load_validator(spec)
-    report = validate_dataset(dataset_path, storage_options=storage_options)
+    if not hasattr(item, "to_dask"):
+        pytest.fail(f"Dataset '{dataset_name}' does not support to_dask().")
+    ds = item.to_dask()
+    report = validate_dataset(ds)
     buffer = io.StringIO()
     # Rich writes tables to stdout; capture and replay to stderr so CI logs include the report.
     with redirect_stdout(buffer):
