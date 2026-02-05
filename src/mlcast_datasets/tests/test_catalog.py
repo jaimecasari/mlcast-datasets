@@ -1,7 +1,5 @@
 import importlib
-import io
 import sys
-from contextlib import redirect_stdout
 
 import pytest
 from loguru import logger
@@ -73,11 +71,7 @@ def test_dataset_passes_validator(catalog, dataset_name):
         pytest.fail(f"Dataset '{dataset_name}' does not support to_dask().")
     ds = item.to_dask()
     report = validate_dataset(ds)
-    buffer = io.StringIO()
-    # Rich writes tables to stdout; capture and replay to stderr so CI logs include the report.
-    with redirect_stdout(buffer):
-        report.console_print()
-    print(buffer.getvalue(), file=sys.stderr)
+    report.console_print(file=sys.stderr)
 
     if report.has_fails():
         pytest.fail(report.summarize())
