@@ -70,7 +70,12 @@ def test_dataset_passes_validator(catalog, dataset_name):
     if not hasattr(item, "to_dask"):
         pytest.fail(f"Dataset '{dataset_name}' does not support to_dask().")
     ds = item.to_dask()
-    report = validate_dataset(ds)
+
+    # set storage_options explicitly on ds.attrs so that it is available to the
+    # validator, which needs these when working out the zarr store path for the
+    # dataset (looking for consolidated meta data), the storage options
+    ds.encoding["storage_options"] = item.reader.data.storage_options
+    report, _ = validate_dataset(ds)
     report.console_print(file=sys.stderr)
 
     if report.has_fails():
