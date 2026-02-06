@@ -12,7 +12,6 @@ dependencies = [
     "intake-xarray>=2.0.0",
     "ipykernel>=6.29.5",
     "jinja2>=3.1.6",
-    "mlcast-dataset-validator",
     "s3fs>=2025.0.0",
 ]
 license = "Apache-2.0 OR BSD-3-Clause"
@@ -41,6 +40,10 @@ docs = [
     "jupyter-book>=1.0.4.post1",
     "sphinxcontrib-mermaid>=1.0.0",
 ]
+ci = []
+validation = [
+    "mlcast-dataset-validator>=0.2.0",
+]
 
 [build-system]
 requires = ["setuptools>=61", "setuptools_scm"]
@@ -58,6 +61,3 @@ mlcast_datasets = ["catalog/*.yaml", "catalog/**/*.yaml"]
 
 [tool.setuptools_scm]
 version_scheme = "post-release"
-
-[tool.uv.sources]
-mlcast-dataset-validator = { git = "https://github.com/leifdenby/mlcast-sourcedata-validator", rev = "refactor/validate-by-xr-dataset" }
