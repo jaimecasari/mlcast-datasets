@@ -10,23 +10,53 @@ from ._metadata import select_plot_variable
 
 
 def _uniform_indices(n_total: int, n_samples: int) -> np.ndarray:
-    """Return n_samples evenly-spaced integer indices in [0, n_total-1]."""
+    """Return evenly-spaced integer indices spanning an index range.
+
+    Parameters
+    ----------
+    n_total : int
+        Total number of elements in the range ``[0, n_total - 1]``.
+    n_samples : int
+        Desired number of indices. Clamped to *n_total* if larger.
+
+    Returns
+    -------
+    np.ndarray
+        1-D integer array of length ``min(n_samples, n_total)``.
+    """
     return np.linspace(0, n_total - 1, min(n_samples, n_total), dtype=int)
 
 
 def compute_welford_stats(
     ds: xr.Dataset, var_name: str | None = None, n_samples: int = 2000
 ) -> dict[str, np.ndarray]:
-    """Mean/std/max maps and value histogram over sampled frames.
+    """Compute mean, std, max maps and a value histogram over sampled frames.
 
-    Computes all five quantities in a single dask scheduler pass so
-    the data is read from zarr only once.
+    All statistics are computed in a single dask scheduler pass so the
+    data is read from Zarr only once.
 
-    Returns a dict with keys:
-        mean, std, max_val  -- 2D arrays (ny, nx)
-        n_valid             -- 2D int64 array
-        hist_counts         -- 1D int64 array (199 bins)
-        hist_bins           -- 1D float64 array (200 edges, log-spaced 0.01..1000)
+    Parameters
+    ----------
+    ds : xr.Dataset
+        Input dataset backed by Zarr or in-memory arrays.
+    var_name : str or None, optional
+        Name of the data variable to analyse. Auto-detected via
+        :func:`select_plot_variable` when ``None``.
+    n_samples : int, optional
+        Number of uniformly spaced timesteps to sample. Default is 2000.
+
+    Returns
+    -------
+    dict of str to np.ndarray
+        Dictionary with the following keys:
+
+        - ``'mean'`` : 2-D float array (ny, nx) -- temporal mean.
+        - ``'std'`` : 2-D float array (ny, nx) -- temporal standard deviation.
+        - ``'max_val'`` : 2-D float array (ny, nx) -- temporal maximum.
+        - ``'n_valid'`` : 2-D int64 array (ny, nx) -- count of valid samples.
+        - ``'hist_counts'`` : 1-D int64 array (199 bins) -- histogram counts.
+        - ``'hist_bins'`` : 1-D float64 array (200 edges) -- log-spaced bin
+          edges from 0.01 to 1000.
     """
     if var_name is None:
         var_name = select_plot_variable(ds)
@@ -81,7 +111,24 @@ def compute_welford_stats(
 def compute_spatial_coverage(
     ds: xr.Dataset, var_name: str | None = None, n_samples: int = 1000
 ) -> xr.DataArray:
-    """Fraction of valid observations per pixel, in [0, 1]."""
+    """Compute the fraction of valid (non-NaN) observations per pixel.
+
+    Parameters
+    ----------
+    ds : xr.Dataset
+        Input dataset.
+    var_name : str or None, optional
+        Name of the data variable. Auto-detected via
+        :func:`select_plot_variable` when ``None``.
+    n_samples : int, optional
+        Number of uniformly spaced timesteps to sample. Default is 1000.
+
+    Returns
+    -------
+    xr.DataArray
+        2-D DataArray with values in ``[0, 1]`` representing the fraction
+        of sampled timesteps with valid data at each grid cell.
+    """
     if var_name is None:
         var_name = select_plot_variable(ds)
     N = ds[var_name].shape[0]
@@ -95,9 +142,23 @@ def compute_spatial_coverage(
 def compute_monthly_stats(
     ds: xr.Dataset, var_name: str | None = None, n_samples: int = 3000
 ) -> dict[int, list[float]]:
-    """Domain-mean values grouped by month.
+    """Compute domain-mean values grouped by calendar month.
 
-    Returns a dict mapping month number (1-12) to a list of float spatial-mean values.
+    Parameters
+    ----------
+    ds : xr.Dataset
+        Input dataset.
+    var_name : str or None, optional
+        Name of the data variable. Auto-detected via
+        :func:`select_plot_variable` when ``None``.
+    n_samples : int, optional
+        Number of uniformly spaced timesteps to sample. Default is 3000.
+
+    Returns
+    -------
+    dict of int to list of float
+        Mapping from month number (1--12) to a list of spatial-mean values
+        for the sampled timesteps falling in that month.
     """
     if var_name is None:
         var_name = select_plot_variable(ds)

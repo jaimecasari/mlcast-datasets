@@ -25,23 +25,45 @@ def plot_spatial_coverage(
     map_resolution: str = "10m",
     output_path: str | None = None,
 ) -> Figure:
-    """Plot the fraction of valid observations per pixel.
+    """Plot the fraction of valid observations per pixel as a map.
 
-    Args:
-        ds: xarray Dataset with a 3D (time, y, x) variable.
-        var_name: Variable to analyse (auto-detected if None).
-        n_samples: Number of frames to sample uniformly across time.
-        title: Figure title.
-        figsize: Figure size in inches.
-        cmap: Colormap name.
-        vmin, vmax: Colorbar range.
-        contour_levels: Iso-contour levels to overlay.
-        contour_colors: Colors for the contour lines.
-        map_resolution: NaturalEarth feature resolution.
-        output_path: If given, save figure to this path.
+    Parameters
+    ----------
+    ds : xr.Dataset
+        Input dataset with a 3-D ``(time, y, x)`` data variable and
+        2-D ``lat``/``lon`` coordinate variables.
+    var_name : str or None, optional
+        Data variable to analyse. Auto-detected via
+        :func:`~mlcast_datasets.plotting._metadata.select_plot_variable`
+        when ``None``.
+    n_samples : int, optional
+        Number of uniformly spaced timesteps to sample. Default is 1000.
+    title : str, optional
+        Figure title. Default is ``'Spatial Data Coverage'``.
+    figsize : tuple of float, optional
+        Figure size ``(width, height)`` in inches. Default is ``(6, 8)``.
+    cmap : str, optional
+        Matplotlib colormap name. Default is ``'YlOrRd_r'``.
+    vmin : float, optional
+        Lower bound of the colourbar. Default is 0.
+    vmax : float, optional
+        Upper bound of the colourbar. Default is 1.
+    contour_levels : tuple of float, optional
+        Iso-contour levels to overlay on the map.
+        Default is ``(0.5, 0.9)``.
+    contour_colors : tuple of str, optional
+        Colours for the contour lines, matched 1-to-1 with
+        *contour_levels*. Default is ``('#c0392b', '#2c3e50')``.
+    map_resolution : str, optional
+        Natural Earth feature resolution (``'10m'``, ``'50m'``, or
+        ``'110m'``). Default is ``'10m'``.
+    output_path : str or None, optional
+        If given, save the figure to this file path.
 
-    Returns:
-        matplotlib Figure.
+    Returns
+    -------
+    matplotlib.figure.Figure
+        The generated spatial coverage figure.
     """
     setup_rcparams()
     if var_name is None:

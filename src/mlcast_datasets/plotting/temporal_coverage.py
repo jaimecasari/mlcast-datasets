@@ -17,7 +17,25 @@ from ._metadata import infer_time_step_minutes
 def _parse_base_frequencies(
     freq_str: str,
 ) -> list[tuple[int, pd.Timestamp, pd.Timestamp]]:
-    """Parse the base_frequencies attribute string into a list of (freq_min, start, end) tuples."""
+    """Parse the ``base_frequencies`` dataset attribute into structured tuples.
+
+    The attribute string uses the format
+    ``'15min:2010-01-01/2014-06-01; 10min:2014-06-01/2020-07-01; ...'``.
+
+    Parameters
+    ----------
+    freq_str : str
+        Semi-colon-separated frequency bands, each as
+        ``'{freq}min:{start}/{end}'``. An empty string returns an empty
+        list.
+
+    Returns
+    -------
+    list of tuple(int, pd.Timestamp, pd.Timestamp)
+        Each tuple contains ``(freq_min, start, end)`` where *freq_min* is
+        the temporal frequency in minutes. An ``end`` value of ``'None'``
+        in the input is mapped to ``pd.Timestamp('2100-01-01')``.
+    """
     bands = []
     if not freq_str:
         return bands
@@ -47,18 +65,33 @@ def plot_temporal_coverage(
 ) -> Figure:
     """Plot a heatmap of monthly data completeness and a yearly timestep bar chart.
 
-    Gracefully handles datasets with or without ``missing_times`` and ``base_frequencies``.
+    Gracefully handles datasets with or without ``missing_times`` and
+    ``base_frequencies`` attributes.
 
-    Args:
-        ds: xarray Dataset.
-        title: Heatmap title.
-        figsize: Figure size in inches.
-        cmap: Colormap for the heatmap (default RdYlGn).
-        completeness_levels: BoundaryNorm levels (default [0,50,70,80,90,95,98,100]).
-        output_path: If given, save figure to this path.
+    Parameters
+    ----------
+    ds : xr.Dataset
+        Input dataset with a ``time`` coordinate. Optionally contains a
+        ``missing_times`` coordinate and a ``base_frequencies`` global
+        attribute.
+    title : str, optional
+        Title for the heatmap panel.
+        Default is ``'Monthly Data Completeness'``.
+    figsize : tuple of float, optional
+        Figure size ``(width, height)`` in inches. Default is ``(8, 7.5)``.
+    cmap : matplotlib.colors.Colormap or None, optional
+        Colormap for the completeness heatmap. Default is
+        ``plt.cm.RdYlGn``.
+    completeness_levels : list of float or None, optional
+        Boundary values for the ``BoundaryNorm`` applied to the heatmap.
+        Default is ``[0, 50, 70, 80, 90, 95, 98, 100]``.
+    output_path : str or None, optional
+        If given, save the figure to this file path.
 
-    Returns:
-        matplotlib Figure.
+    Returns
+    -------
+    matplotlib.figure.Figure
+        The generated two-panel figure (heatmap + bar chart).
     """
     setup_rcparams()
 

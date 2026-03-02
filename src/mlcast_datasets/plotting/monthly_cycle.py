@@ -46,21 +46,37 @@ def plot_monthly_cycle(
     season_colors: list[str] | None = None,
     output_path: str | None = None,
 ) -> Figure:
-    """Plot a boxplot of domain-mean values grouped by month.
+    """Plot a boxplot of domain-mean values grouped by calendar month.
 
-    Args:
-        ds: xarray Dataset with a 3D (time, y, x) variable.
-        var_name: Variable to analyse (auto-detected if None).
-        n_samples: Number of frames to sample uniformly across time.
-        title: Figure title.
-        ylabel: Y-axis label (auto-generated from variable attrs if None).
-        figsize: Figure size in inches.
-        show_fliers: Whether to show boxplot outliers.
-        season_colors: List of 12 colors (one per month). Defaults to seasonal scheme.
-        output_path: If given, save figure to this path.
+    Parameters
+    ----------
+    ds : xr.Dataset
+        Input dataset with a 3-D ``(time, y, x)`` data variable.
+    var_name : str or None, optional
+        Data variable to analyse. Auto-detected via
+        :func:`~mlcast_datasets.plotting._metadata.select_plot_variable`
+        when ``None``.
+    n_samples : int, optional
+        Number of uniformly spaced timesteps to sample. Default is 3000.
+    title : str, optional
+        Figure title. Default is ``'Monthly Precipitation Climatology'``.
+    ylabel : str or None, optional
+        Y-axis label. Auto-generated from the variable's ``long_name``
+        and ``units`` attributes when ``None``.
+    figsize : tuple of float, optional
+        Figure size ``(width, height)`` in inches. Default is ``(7, 4)``.
+    show_fliers : bool, optional
+        Whether to show boxplot outlier points. Default is ``False``.
+    season_colors : list of str or None, optional
+        List of 12 colour strings (one per month, Jan--Dec). Defaults to
+        a seasonal colour scheme (blue/green/orange/red).
+    output_path : str or None, optional
+        If given, save the figure to this file path.
 
-    Returns:
-        matplotlib Figure.
+    Returns
+    -------
+    matplotlib.figure.Figure
+        The generated monthly-cycle boxplot figure.
     """
     setup_rcparams()
     if var_name is None:

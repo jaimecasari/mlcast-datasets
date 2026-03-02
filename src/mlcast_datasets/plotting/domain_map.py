@@ -25,20 +25,39 @@ def plot_domain_map(
 ) -> Figure:
     """Plot a domain overview map showing the radar coverage footprint.
 
-    Args:
-        ds: xarray Dataset.
-        var_name: Variable to use (auto-detected if None).
-        n_coverage_samples: Number of frames to union for the domain mask.
-        title: Figure title (auto-generated from dataset attrs if None).
-        figsize: Figure size in inches.
-        cmap: Colormap for the coverage fill.
-        alpha: Opacity of the coverage fill.
-        map_resolution: NaturalEarth feature resolution.
-        show_admin_boundaries: If True, overlay sub-national admin boundaries.
-        output_path: If given, save figure to this path.
+    Parameters
+    ----------
+    ds : xr.Dataset
+        Input dataset with 2-D ``lat``/``lon`` coordinate variables.
+    var_name : str or None, optional
+        Data variable used to determine coverage. Auto-detected via
+        :func:`~mlcast_datasets.plotting._metadata.select_plot_variable`
+        when ``None``.
+    n_coverage_samples : int, optional
+        Number of frames sampled to compute the domain mask.
+        Default is 100.
+    title : str or None, optional
+        Figure title. Auto-generated from dataset attributes when ``None``.
+    figsize : tuple of float, optional
+        Figure size ``(width, height)`` in inches. Default is ``(6, 8)``.
+    cmap : str, optional
+        Matplotlib colormap name for the coverage fill.
+        Default is ``'Blues'``.
+    alpha : float, optional
+        Opacity of the coverage fill, in ``[0, 1]``. Default is 0.4.
+    map_resolution : str, optional
+        Natural Earth feature resolution (``'10m'``, ``'50m'``, or
+        ``'110m'``). Default is ``'10m'``.
+    show_admin_boundaries : bool, optional
+        If ``True``, overlay sub-national administrative boundaries.
+        Default is ``False``.
+    output_path : str or None, optional
+        If given, save the figure to this file path.
 
-    Returns:
-        matplotlib Figure.
+    Returns
+    -------
+    matplotlib.figure.Figure
+        The generated domain map figure.
     """
     setup_rcparams()
     if var_name is None:

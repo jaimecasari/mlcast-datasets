@@ -32,22 +32,56 @@ def plot_precipitation_stats(
 ) -> tuple[Figure, Figure]:
     """Plot 3-panel stat maps (mean, max, std) and a precipitation histogram.
 
-    Args:
-        ds: xarray Dataset.
-        var_name: Variable to analyse (auto-detected if None).
-        n_samples: Number of frames to sample.
-        figsize_maps: Figure size for the 3-panel map.
-        figsize_hist: Figure size for the histogram.
-        cmap_mean, cmap_max, cmap_std: Colormaps for each panel.
-        max_vmin, max_vmax: Log-scale range for the max panel.
-        hist_color: Bar color for the histogram.
-        hist_xlim: X-axis limits for the histogram.
-        map_resolution: NaturalEarth feature resolution.
-        output_path_maps: If given, save the map figure.
-        output_path_hist: If given, save the histogram figure.
+    Produces two figures: a triptych of spatial maps and a log--log
+    histogram of non-zero precipitation values.
 
-    Returns:
-        (fig_maps, fig_hist) tuple of matplotlib Figures.
+    Parameters
+    ----------
+    ds : xr.Dataset
+        Input dataset with 2-D ``lat``/``lon`` coordinate variables.
+    var_name : str or None, optional
+        Data variable to analyse. Auto-detected via
+        :func:`~mlcast_datasets.plotting._metadata.select_plot_variable`
+        when ``None``.
+    n_samples : int, optional
+        Number of uniformly spaced timesteps to sample. Default is 2000.
+    figsize_maps : tuple of float, optional
+        Figure size ``(width, height)`` for the 3-panel map.
+        Default is ``(15, 5.5)``.
+    figsize_hist : tuple of float, optional
+        Figure size ``(width, height)`` for the histogram.
+        Default is ``(6, 4)``.
+    cmap_mean : str, optional
+        Colormap for the mean panel. Default is ``'YlGnBu'``.
+    cmap_max : str, optional
+        Colormap for the maximum panel. Default is ``'YlOrRd'``.
+    cmap_std : str, optional
+        Colormap for the standard-deviation panel. Default is ``'OrRd'``.
+    max_vmin : float, optional
+        Lower bound of the log-scale range for the max panel.
+        Default is 1.
+    max_vmax : float, optional
+        Upper bound of the log-scale range for the max panel.
+        Default is 300.
+    hist_color : str, optional
+        Bar fill colour for the histogram. Default is ``'#3182bd'``.
+    hist_xlim : tuple of float, optional
+        ``(xmin, xmax)`` limits for the histogram x-axis.
+        Default is ``(0.01, 1000)``.
+    map_resolution : str, optional
+        Natural Earth feature resolution (``'10m'``, ``'50m'``, or
+        ``'110m'``). Default is ``'50m'``.
+    output_path_maps : str or None, optional
+        If given, save the map figure to this file path.
+    output_path_hist : str or None, optional
+        If given, save the histogram figure to this file path.
+
+    Returns
+    -------
+    fig_maps : matplotlib.figure.Figure
+        The 3-panel spatial statistics figure.
+    fig_hist : matplotlib.figure.Figure
+        The precipitation value histogram figure.
     """
     setup_rcparams()
     if var_name is None:

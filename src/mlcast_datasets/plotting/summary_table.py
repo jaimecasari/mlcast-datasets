@@ -19,14 +19,28 @@ def generate_summary_table(
 ) -> pd.DataFrame:
     """Build a summary table of dataset metadata.
 
-    Args:
-        ds: xarray Dataset.
-        var_name: Variable to describe (auto-detected if None).
-        compressed_size_bytes: On-disk compressed size in bytes (optional).
-        output_path: If given, save the DataFrame as CSV to this path.
+    Extracts time range, grid dimensions, CRS, compression statistics,
+    and other properties into a two-column DataFrame.
 
-    Returns:
-        DataFrame with columns ["Property", "Value"].
+    Parameters
+    ----------
+    ds : xr.Dataset
+        Input dataset to summarise.
+    var_name : str or None, optional
+        Data variable to describe. Auto-detected via
+        :func:`~mlcast_datasets.plotting._metadata.select_plot_variable`
+        when ``None``.
+    compressed_size_bytes : int or None, optional
+        On-disk compressed size in bytes. When provided, compression ratio
+        and compressed volume are included in the table.
+    output_path : str or None, optional
+        If given, save the DataFrame as a CSV file to this path.
+
+    Returns
+    -------
+    pd.DataFrame
+        Two-column DataFrame with columns ``['Property', 'Value']``
+        containing one row per metadata property.
     """
     if var_name is None:
         var_name = select_plot_variable(ds)

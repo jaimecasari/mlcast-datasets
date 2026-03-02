@@ -32,21 +32,47 @@ def plot_sample_precipitation(
 ) -> Figure:
     """Plot a grid of precipitation maps from a specific event window.
 
-    Args:
-        ds: xarray Dataset.
-        time_slice: REQUIRED. A slice object, e.g. slice("2023-05-16", "2023-05-17T06:00").
-        var_name: Variable to plot (auto-detected if None).
-        time_spacing_hours: Minimum spacing between selected frames.
-        max_frames: Maximum number of frames to show (determines grid layout).
-        title: Figure suptitle (auto-generated from time range if None).
-        figsize: Figure size in inches.
-        levels: Discrete colorbar levels (default: [0, 0.1, 0.5, 1, 2, 5, 10, 20, 50, 100]).
-        colors: Colors for the discrete bins (default: 9-color scheme).
-        map_resolution: NaturalEarth feature resolution.
-        output_path: If given, save figure to this path.
+    Selects frames from the time window at a minimum spacing of
+    *time_spacing_hours* and renders each on a separate map panel with
+    a shared discrete precipitation colorbar.
 
-    Returns:
-        matplotlib Figure.
+    Parameters
+    ----------
+    ds : xr.Dataset
+        Input dataset with 2-D ``lat``/``lon`` coordinate variables.
+    time_slice : slice
+        Time range to select, e.g.
+        ``slice('2023-05-16', '2023-05-17T06:00')``. **Required.**
+    var_name : str or None, optional
+        Data variable to plot. Auto-detected via
+        :func:`~mlcast_datasets.plotting._metadata.select_plot_variable`
+        when ``None``.
+    time_spacing_hours : int, optional
+        Minimum spacing in hours between consecutive displayed frames.
+        Default is 3.
+    max_frames : int, optional
+        Maximum number of map panels to show. Default is 6.
+    title : str or None, optional
+        Figure super-title. Auto-generated from the first timestamp
+        when ``None``.
+    figsize : tuple of float, optional
+        Figure size ``(width, height)`` in inches. Default is ``(12, 9)``.
+    levels : list of float or None, optional
+        Discrete colourbar boundaries. Default is
+        ``[0, 0.1, 0.5, 1, 2, 5, 10, 20, 50, 100]``.
+    colors : list of str or None, optional
+        Hex colour strings for the discrete bins (one fewer than
+        *levels*). Default is a 9-colour ramp.
+    map_resolution : str, optional
+        Natural Earth feature resolution (``'10m'``, ``'50m'``, or
+        ``'110m'``). Default is ``'50m'``.
+    output_path : str or None, optional
+        If given, save the figure to this file path.
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+        The generated multi-panel precipitation figure.
     """
     setup_rcparams()
     if var_name is None:
