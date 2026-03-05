@@ -8,13 +8,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased](https://github.com/mlcast-community/mlcast-datasets)
 
 ### Added
+- UK Met Office C-band rain radar 1 km composite (2005-2025, 5min, OSGB 1 km) [\#17](https://github.com/mlcast-community/mlcast-datasets/issues/17), @franchg
 - Danish radar precipitation dataset covering 2016-2025 at 10min, 0.5km resolution, [\#21](https://github.com/mlcast-community/mlcast-datasets/pull/21), @arjj8
+- Italian DPC SRI radar precipitation dataset (2010-2025, 1km, 5min) [\#14](https://github.com/mlcast-community/mlcast-datasets/issues/14), @franchg
 
 ### Maintenance
 
 - Fix jupyter book badge in README and update black with pre-commit to fix ci [\#18](https://github.com/mlcast-community/mlcast-datasets/pull/18), @leifdenby
 - Fix jupyter book rendering in github actions workflow by pinning jupyter book version <2 [\#24](https://github.com/mlcast-community/mlcast-datasets/pull/24), @leifdenby
 - Ensure all datasets in intake catalog pass validator by adding a test that runs mlcast-dataset-validator against each dataset [\#22](https://github.com/mlcast-community/mlcast-datasets/pull/22), @leifdenby
+
+### Fixed
+
+- A bug that made non-detection values into nan was fixed in the DMI dataset [\#32](https://github.com/mlcast-community/mlcast-datasets/pull/32), @arjj8
+
+- Update DWD-DE-radklim dataset to `v0.1.1` that fixes meta-information to match mlcast-validator requirements and rename `RR` field to `rainfall_amount` to be consistent with the units and standard name used [\#33](https://github.com/mlcast-community/mlcast-datasets/pull/33), @leifdenby
+
 
 ## [v0.1.1](https://github.com/mlcast-community/mlcast-datasets/releases/tag/v0.1.1) - 2025-01-03
 
