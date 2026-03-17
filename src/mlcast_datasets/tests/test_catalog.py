@@ -1,7 +1,14 @@
+import importlib
+import sys
+
 import pytest
 from loguru import logger
 
 import mlcast_datasets
+
+VALIDATOR_SPECS = {
+    "precipitation": ("source_data", "radar_precipitation"),
+}
 
 
 @pytest.fixture
@@ -32,6 +39,47 @@ def test_get_intake_source(catalog, dataset_name):
             pass
         else:
             raise Exception(plugin)
+
+
+def _infer_validator_spec(dataset_name: str):
+    parts = dataset_name.replace("/", ".").split(".")
+    if not parts:
+        return None
+    return VALIDATOR_SPECS.get(parts[0])
+
+
+def _load_validator(spec):
+    data_stage, product = spec
+    module = importlib.import_module(
+        f"mlcast_dataset_validator.specs.{data_stage}.{product}"
+    )
+    return module.validate_dataset
+
+
+@pytest.mark.parametrize("dataset_name", all_entries())
+def test_dataset_passes_validator(catalog, dataset_name):
+    item = catalog[dataset_name]
+    if item.container == "catalog":
+        pytest.skip("Catalog entry; validator applies to datasets only.")
+
+    spec = _infer_validator_spec(dataset_name)
+    if spec is None:
+        pytest.fail(f"No validator spec mapping for dataset '{dataset_name}'.")
+
+    validate_dataset = _load_validator(spec)
+    if not hasattr(item, "to_dask"):
+        pytest.fail(f"Dataset '{dataset_name}' does not support to_dask().")
+    ds = item.to_dask()
+
+    # set storage_options explicitly on ds.attrs so that it is available to the
+    # validator, which needs these when working out the zarr store path for the
+    # dataset (looking for consolidated meta data), the storage options
+    ds.encoding["storage_options"] = item.reader.data.storage_options
+    report, _ = validate_dataset(ds)
+    report.console_print(file=sys.stderr)
+
+    if report.has_fails():
+        pytest.fail(report.summarize())
 
 
 @pytest.mark.modified_on_branch

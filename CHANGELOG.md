@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/mlcast-community/mlcast-datasets)
+## [v0.2.0](https://github.com/mlcast-community/mlcast-datasets/releases/tag/v0.2.0) - 2026-03-17
+
+This release includes three new radar precipitation datasets from the UK, Denmark, and Italy, as well as several maintenance updates to ensure all datasets in the catalog pass validation checks and to fix some rendering issues in the documentation.
 
 ### Added
 - UK Met Office C-band rain radar 1 km composite (2005-2025, 5min, OSGB 1 km) [\#17](https://github.com/mlcast-community/mlcast-datasets/issues/17), @franchg
@@ -16,9 +18,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix jupyter book badge in README and update black with pre-commit to fix ci [\#18](https://github.com/mlcast-community/mlcast-datasets/pull/18), @leifdenby
 - Fix jupyter book rendering in github actions workflow by pinning jupyter book version <2 [\#24](https://github.com/mlcast-community/mlcast-datasets/pull/24), @leifdenby
+- Ensure all datasets in intake catalog pass validator by adding a test that runs mlcast-dataset-validator against each dataset [\#22](https://github.com/mlcast-community/mlcast-datasets/pull/22), @leifdenby
+- Fix copyright year rendered in jupyterbook footer [\#34](https://github.com/mlcast-community/mlcast-datasets/pull/34), @leifdenby
 
-### Fixes
+### Fixed
+
 - A bug that made non-detection values into nan was fixed in the DMI dataset [\#32](https://github.com/mlcast-community/mlcast-datasets/pull/32), @arjj8
+
+- Update DWD-DE-radklim dataset to `v0.1.1` that fixes meta-information to match mlcast-validator requirements and rename `RR` field to `rainfall_amount` to be consistent with the units and standard name used [\#33](https://github.com/mlcast-community/mlcast-datasets/pull/33), @leifdenby
+
 
 ## [v0.1.1](https://github.com/mlcast-community/mlcast-datasets/releases/tag/v0.1.1) - 2025-01-03
 
