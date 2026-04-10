@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Belgian RADCLIM radar precipitation dataset covering 2017-2023 at 5min, 1km resolution [\#26](https://github.com/mlcast-community/mlcast-datasets/issues/26)
+
+### Documentation
+- Add JupyterBook build checks and live preview deployments to all pull requests [\#37](https://github.com/mlcast-community/mlcast-datasets/pull/37), @leifdenby
+
+
 ## [v0.2.0](https://github.com/mlcast-community/mlcast-datasets/releases/tag/v0.2.0) - 2026-03-17
 
 This release includes three new radar precipitation datasets from the UK, Denmark, and Italy, as well as several maintenance updates to ensure all datasets in the catalog pass validation checks and to fix some rendering issues in the documentation.

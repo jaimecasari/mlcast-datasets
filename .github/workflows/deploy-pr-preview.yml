@@ -1,0 +1,75 @@
+# ==============================================================================
+# WORKFLOW: Deploy PR Preview
+#
+# WHEN IT RUNS:
+# - Automatically triggered *after* the "docs" workflow completes.
+#
+# WHAT IT DOES:
+# This is the "trusted" part of the PR preview process, allowing us to safely
+# deploy previews for PRs originating from forks without hitting 403 Forbidden errors.
+# 1. Runs in the privileged context of the base repository.
+# 2. Downloads the built HTML and PR metadata artifacts from the "docs" run.
+# 3. If the PR is open/updated: Deploys the preview to the `gh-pages` branch
+#    and posts a comment with the link on the PR.
+# 4. If the PR is closed: Removes the preview folder from the `gh-pages` branch.
+# ==============================================================================
+name: Deploy PR Preview
+
+on:
+  workflow_run:
+    workflows: ["docs"]
+    types:
+      - completed
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.event == 'pull_request'
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Download PR Info
+      uses: actions/download-artifact@v4
+      with:
+        name: pr-info
+        run-id: ${{ github.event.workflow_run.id }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        path: pr_info
+
+    - name: Read PR Info
+      id: pr_info
+      run: |
+        echo "pr_number=$(cat pr_info/pr_number.txt)" >> $GITHUB_ENV
+        echo "action=$(cat pr_info/action.txt)" >> $GITHUB_ENV
+
+    - name: Download built docs
+      if: env.action != 'closed' && github.event.workflow_run.conclusion == 'success'
+      uses: actions/download-artifact@v4
+      with:
+        name: built-docs
+        run-id: ${{ github.event.workflow_run.id }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        path: docs/_build/html
+
+    - name: Deploy PR Preview
+      if: env.action != 'closed' && github.event.workflow_run.conclusion == 'success'
+      uses: rossjrw/pr-preview-action@v1
+      with:
+        source-dir: docs/_build/html/
+        preview-branch: gh-pages
+        pr-id: ${{ env.pr_number }}
+        action: deploy
+
+    - name: Remove PR Preview
+      if: env.action == 'closed'
+      uses: rossjrw/pr-preview-action@v1
+      with:
+        source-dir: .
+        preview-branch: gh-pages
+        pr-id: ${{ env.pr_number }}
+        action: remove
