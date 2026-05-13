@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## unreleased
 
 ### Documentation
-- Add step describing how to upload an example repository to mlcast-community demonstrating how to download raw data (if open) and transform it into Zarr format, including instructions to join the organization
+- Add step 7 describing how to upload an example repository to mlcast-community demonstrating how to download raw data (if open) and transform it into Zarr format, including instructions to join the organization
 
 ## [v0.3.0](https://github.com/mlcast-community/mlcast-datasets/releases/tag/v0.3.0)
 
