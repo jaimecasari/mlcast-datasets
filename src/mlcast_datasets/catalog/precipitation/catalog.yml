@@ -84,7 +84,3 @@ sources:
       storage_options:
         anon: true
         endpoint_url: "https://object-store.os-api.cci2.ecmwf.int"
-
-
-
-        
