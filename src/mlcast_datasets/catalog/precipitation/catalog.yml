@@ -69,7 +69,6 @@ sources:
     args:
       urlpath: "s3://mlcast-source-datasets/aemet/v0.1.1/aemet_ppi_10min_ZAR.zarr/"
       consolidated: true
-      create_default_indexes: false
       storage_options:
         anon: true
         endpoint_url: "https://object-store.os-api.cci2.ecmwf.int"
@@ -80,7 +79,6 @@ sources:
     args:
       urlpath: "s3://mlcast-source-datasets/aemet/v0.1.1/aemet_sri_10min_ZAR.zarr/"
       consolidated: true
-      create_default_indexes: false
       storage_options:
         anon: true
         endpoint_url: "https://object-store.os-api.cci2.ecmwf.int"
