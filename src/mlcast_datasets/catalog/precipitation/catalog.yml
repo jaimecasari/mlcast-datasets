@@ -82,7 +82,7 @@ sources:
       storage_options:
         anon: true
         endpoint_url: "https://object-store.os-api.cci2.ecmwf.int"
-        
+
   fr_mf_prate_5min:
     description: "Météo-France 1 km radar rainfall amount dataset (mm*10^-2) converted in precipitation rate (mm/h)"
     driver: zarr
