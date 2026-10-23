@@ -9,9 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Spanish Aemet rain radar 1 km Single site Zaragoza (2020-2024, 10min, 1km) [\#17](https://github.com/mlcast-community/mlcast-datasets/issues/45), @jaimecasari
+- Each catalog entry now records the `mlcast-dataset-validator` version that its dataset conforms to in `metadata.mlcast_dataset_validator_version`, set to v0.3.0 for all existing datasets. CI checks that this matches the dataset's own `mlcast_dataset_validator_version` attribute (assumed to be v0.3.0 when missing), and validates each dataset against that version: in-process when it matches the version pinned in `pyproject.toml`, otherwise in an isolated environment with `uvx` (pass/fail only). @leifdenby
+
+### Changed
+- `mlcast-dataset-validator` is no longer a runtime dependency. It's now only in the `ci` dependency group, pinned to v0.3.0, and the `validation` dependency group has been removed. The `ci` group now holds just what the tests need, the `dev` group includes it, and the data availability check installs only the `ci` group. @leifdenby
 
 ### Documentation
 - Add step 7 to CONTRIBUTING.md requiring contributors to create and upload an example repository to mlcast-community, demonstrating how to download data from their organization, transform it into Zarr format, and request an invitation to join the community in order to publish their repository
+
+### Fixes
+- Adding the missing two attributes to the danish zarr dataset. [\#41](https://github.com/mlcast-community/mlcast-dataset-validator/pull/41). @arjj8
+
+### Maintenance
+- Add CI check that fails pull requests which don't update `CHANGELOG.md`; PRs that don't need an entry can opt out with the `no changelog` label [\#59](https://github.com/mlcast-community/mlcast-datasets/pull/59), @leifdenby
 
 ## [v0.3.0](https://github.com/mlcast-community/mlcast-datasets/releases/tag/v0.3.0)
 
@@ -48,6 +58,9 @@ This release includes three new radar precipitation datasets from the UK, Denmar
 
 - Update DWD-DE-radklim dataset to `v0.1.1` that fixes meta-information to match mlcast-validator requirements and rename `RR` field to `rainfall_amount` to be consistent with the units and standard name used [\#33](https://github.com/mlcast-community/mlcast-datasets/pull/33), @leifdenby
 
+
+### Fixes
+- A bug that made non-detection values into nan was fixed in the DMI dataset [\#32](https://github.com/mlcast-community/mlcast-datasets/pull/32), @arjj8
 
 ## [v0.1.1](https://github.com/mlcast-community/mlcast-datasets/releases/tag/v0.1.1) - 2025-01-03
 
